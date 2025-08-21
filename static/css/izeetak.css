@@ -470,8 +470,12 @@ canvas {
 }
 
 .main-menu-wrapper {
-    position: relative;
-    display: block;
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
+    padding: 20px;
+    flex-wrap: nowrap; 
+    width: 100%; 
 }
 
 .main-menu-wrapper-inner {
@@ -480,17 +484,14 @@ canvas {
 }
 
 .main-menu-wrapper__left {
-    position: relative;
-    display: block;
-    float: left;
+    flex: 0 0 auto; /* 不增长不收缩 */
+    display: flex;
+    align-items: center;
 }
 
 .main-menu-wrapper__logo {
-    position: relative;
-    float: left;
-    padding-top: 25px;
-    padding-bottom: 32px;
-    margin-right: 100px;
+
+    max-width: 50%; 
 }
 
 .main-menu-wrapper__logo img{
@@ -498,16 +499,16 @@ canvas {
 }
 
 .main-menu-wrapper__main-menu {
-    position: relative;
-    display: block;
-    float: left;
+    flex: 1; /* 占据剩余空间 */
+    display: flex;
+    justify-content: flex-end;
 }
 
 .main-menu-wrapper__right {
     position: relative;
     display: flex;
     float: right;
-    padding: 29.5px 0;
+    padding: 10px 0;
     align-items: center;
 }
 

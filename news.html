@@ -1,6 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
 
+<style>
+/* ===== News Cards ===== */
+.news-grid{
+  display:grid;
+  grid-template-columns:repeat(12,1fr);
+  gap:24px;
+}
+@media (max-width:1199.98px){ .news-grid{grid-template-columns:repeat(8,1fr);} }
+@media (max-width:767.98px){ .news-grid{grid-template-columns:repeat(4,1fr);} }
+
+.news-card{
+  grid-column:span 4;                     /* 3列卡片：桌面端每行3张 */
+  background:var(--card-bg,#ffffff);
+  border-radius:18px;
+  box-shadow:0 6px 18px rgba(0,0,0,.06);
+  overflow:hidden;
+  transition:transform .25s ease, box-shadow .25s ease;
+  border:1px solid rgba(0,0,0,.06);
+}
+@media (max-width:1199.98px){ .news-card{grid-column:span 4;} }  /* 平板两列 */
+@media (max-width:767.98px){ .news-card{grid-column:span 4;} }   /* 手机一列 */
+
+.news-card__media{
+  position:relative;
+  aspect-ratio: 16/9;                      /* 统一比例，避免跳动 */
+  overflow:hidden;
+  background:#f5f7fb;
+}
+.news-card__media img{
+  width:100%; height:100%;
+  object-fit:cover; object-position:center;
+  transition:transform .5s ease;
+  display:block;
+}
+.news-card:hover{ transform:translateY(-4px); box-shadow:0 10px 24px rgba(0,0,0,.10); }
+.news-card:hover .news-card__media img{ transform:scale(1.05); }
+
+.news-card__body{ padding:16px 18px 18px; }
+.news-card__meta{
+  display:flex; flex-wrap:wrap; gap:10px; align-items:center;
+  font-size:12px; color:#6c757d;
+  margin-bottom:8px;
+}
+.badge-tag{
+  background:#eef2ff; color:#3b5bcc; border-radius:999px;
+  padding:.25rem .6rem; font-weight:600; font-size:11px;
+}
+.news-card__title{
+  font-size:18px; line-height:1.35; font-weight:700; margin:6px 0 8px;
+  color:#1f2937;
+}
+.news-card__title a{ color:inherit; text-decoration:none; }
+.news-card__title a:hover{ text-decoration:underline; }
+
+.news-card__excerpt{
+  color:#4b5563; font-size:14px; line-height:1.6; margin:0 0 12px;
+  min-height:3.2em; /* 两行高度，视觉整齐 */
+}
+.news-card__footer{
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+}
+.news-card__btn{
+  display:inline-flex; align-items:center; gap:6px;
+  font-size:13px; font-weight:700;
+  padding:8px 12px; border-radius:12px;
+  text-decoration:none; color:#1f3a8a; background:#e6eeff;
+}
+.news-card__btn:hover{ filter:brightness(.95); text-decoration:none; }
+
+/* 暗色模式（如你站点有夜间主题，可复用） */
+@media (prefers-color-scheme: dark){
+  :root{ --card-bg:#0b1324; }
+  .news-card{ border-color:rgba(255,255,255,.06); box-shadow:none; }
+  .news-card__title{ color:#eef2ff; }
+  .news-card__excerpt{ color:#c7d2fe; }
+  .news-card__meta{ color:#9aa6ff; }
+  .badge-tag{ background:#1f2a63; color:#c7d2fe; }
+  .news-card__btn{ background:#1f2a63; color:#c7d2fe; }
+}
+</style>
+
 <head>
     <meta charset="UTF-8">
     <meta name="description" content="NPU-IWC课题组">
@@ -109,35 +190,97 @@
             <section class="news-one news-page">
                 <div class="container">
                     <div class="row">
-                        
-                        <table class="table table-hover table-bordered table-striped table-sm align-middle">
-                            <!-- 表头 -->
-                            <thead class="thead-dark">
-                                <tr >
-                                    <th scope="col" style="text-align: center; width: 150px;">时间</th>
-                                    <th scope="col" style="text-align: center;width: auto;">内容</th>
-                                </tr>
-                            </thead>
-                              <!-- 表内容 -->
-                            <tbody>
-                                <tr>
-                                    <td style="text-align: center;">2023.12</td>
-                                    <td style="text-align: center;">祝贺梁芮槐同学论文被GLOBEMCOM2023接收</td>
-                                </tr>
-                                <tr>
-                                    <td style="text-align: center;">2023.10</td>
-                                    <td style="text-align: center;">祝贺王思雨同学论文被CWSN2023接收</td>
-                                </tr>
-                                <tr>
-                                    <td style="text-align: center;">2023.09</td>
-                                    <td style="text-align: center;">欢迎王凯宁、刘豪、王思雨、梁芮槐、韩润心、张婷同学加入课题组</td>
-                                </tr>
-                                <tr>
-                                    <td style="text-align: center;">2023.09</td>
-                                    <td style="text-align: center;">课题组成立</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <div class="news-grid">
+
+                        <!-- 卡片 1 -->
+                        <article class="news-card">
+                            <div class="news-card__media">
+                            <img src="static/picture/2024party.jpg" alt="GLOBECOM 2023 接收">
+                            </div>
+                            <div class="news-card__body">
+                            <div class="news-card__meta">
+                                <span>2023.12</span>
+                                <span class="badge-tag">论文接收</span>
+                            </div>
+                            <h3 class="news-card__title">
+                                <a href="#">祝贺梁芮槐同学论文被 GLOBECOM 2023 接收</a>
+                            </h3>
+                            <p class="news-card__excerpt">团队在无线通信安全方向取得新进展，论文被 IEEE GLOBECOM 录用。</p>
+                            <div class="news-card__footer">
+                                <span class="text-muted small">阅读约 1 分钟</span>
+                                <a class="news-card__btn" href="#">查看详情
+                                <i class="fa fa-arrow-right" aria-hidden="true"></i>
+                                </a>
+                            </div>
+                            </div>
+                        </article>
+
+                        <!-- 卡片 2 -->
+                        <article class="news-card">
+                            <div class="news-card__media">
+                            <img src="static/picture/2024party.jpg" alt="CWSN 2023 接收">
+
+                            </div>
+                            <div class="news-card__body">
+                            <div class="news-card__meta">
+                                <span>2023.10</span>
+                                <span class="badge-tag">会议</span>
+                            </div>
+                            <h3 class="news-card__title">
+                                <a href="#">祝贺王思雨同学论文被 CWSN 2023 接收</a>
+                            </h3>
+                            <p class="news-card__excerpt">面向物联网安全的协作感知方法获得评审认可，顺利录用。</p>
+                            <div class="news-card__footer">
+                                <span class="text-muted small">阅读约 1 分钟</span>
+                                <a class="news-card__btn" href="#">查看详情 <i class="fa fa-arrow-right"></i></a>
+                            </div>
+                            </div>
+                        </article>
+
+                        <!-- 卡片 3 -->
+                        <article class="news-card">
+                            <div class="news-card__media">
+                            <img src="static/picture/2024party.jpg" alt="新同学加入">
+
+                            </div>
+                            <div class="news-card__body">
+                            <div class="news-card__meta">
+                                <span>2023.09</span>
+                                <span class="badge-tag">迎新</span>
+                            </div>
+                            <h3 class="news-card__title">
+                                <a href="#">欢迎王凯宁、刘豪、王思雨、梁芮槐、韩润心、张婷同学加入课题组</a>
+                            </h3>
+                            <p class="news-card__excerpt">期待在未来的科研学习中携手进步、共同成长。</p>
+                            <div class="news-card__footer">
+                                <span class="text-muted small">阅读约 30 秒</span>
+                                <a class="news-card__btn" href="#">照片集 <i class="fa fa-image"></i></a>
+                            </div>
+                            </div>
+                        </article>
+
+                        <!-- 卡片 4 -->
+                        <article class="news-card">
+                            <div class="news-card__media">
+                            <img src="static/picture/2024party.jpg" alt="课题组成立">
+                            </div>
+                            <div class="news-card__body">
+                            <div class="news-card__meta">
+                                <span>2023.09</span>
+                                <span class="badge-tag">里程碑</span>
+                            </div>
+                            <h3 class="news-card__title">
+                                <a href="#">课题组成立</a>
+                            </h3>
+                            <p class="news-card__excerpt">NPU‑IWC 课题组正式成立，面向无线通信与安全方向开展研究。</p>
+                            <div class="news-card__footer">
+                                <span class="text-muted small">阅读约 20 秒</span>
+                                <a class="news-card__btn" href="#">了解更多 <i class="fa fa-info-circle"></i></a>
+                            </div>
+                            </div>
+                        </article>
+
+                        </div>
                     </div>
                 </div>
             </section>
