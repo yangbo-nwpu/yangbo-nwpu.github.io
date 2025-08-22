@@ -901,3 +901,16 @@
 
 
 })(jQuery);
+
+
+(function(){
+  function setHeaderHeightVar(){
+    var header = document.querySelector('.main-header') || document.querySelector('.stricky-header');
+    var h = header ? Math.round(header.getBoundingClientRect().height) : 0;
+    document.documentElement.style.setProperty('--header-h', h + 'px');
+  }
+  // 初次、窗口变化、字体/图片加载后都更新一次
+  window.addEventListener('load', setHeaderHeightVar, {passive:true});
+  window.addEventListener('resize', setHeaderHeightVar, {passive:true});
+  document.fonts && document.fonts.ready && document.fonts.ready.then(setHeaderHeightVar);
+})();
