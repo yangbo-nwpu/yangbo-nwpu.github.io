@@ -1,210 +1,318 @@
 <!DOCTYPE html>
 <html lang="en">
 
+<style>
+    /* ===== Awards Cards ===== */
+    .awards-wrap{ margin-top:24px; }
+    .filters-bar{
+        display:flex; gap:12px; align-items:center; flex-wrap:wrap;
+        margin-bottom:18px;
+    }
+    #year-select{ min-width:150px; }
+
+    .awards-grid{
+        display:grid; gap:24px;
+        grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));
+    }
+
+    /* 卡片本体 */
+    .award-card{
+        background:var(--card-bg,#ffffff);
+        border:1px solid rgba(0,0,0,.06);
+        border-radius:18px; overflow:hidden;
+        box-shadow:0 6px 18px rgba(0,0,0,.06);
+        transition:transform .25s ease, box-shadow .25s ease;
+    }
+    .award-card:hover{ transform:translateY(-4px); box-shadow:0 10px 24px rgba(0,0,0,.10); }
+
+    /* 封面（可放证书图片；没有图片也能好看） */
+    .award-card__media{ position:relative; overflow:hidden; background:#eef2ff; }
+    .award-card__media::before{ content:""; display:block; padding-top:66.66%; } /* 3:2 fallback */
+    @supports (aspect-ratio: 3/2){
+        .award-card__media{ aspect-ratio:3/2; }
+        .award-card__media::before{ display:none; }
+    }
+    .award-card__media img{
+        position:absolute; inset:0; width:100%; height:100%;
+        object-fit:cover; object-position:center; display:block;
+        transition:transform .5s ease;
+    }
+    .award-card:hover .award-card__media img{ transform:scale(1.04); }
+
+    /* 年份角标 */
+    .badge-year{
+        position:absolute; left:12px; top:12px;
+        background:#1f3a8a; color:#fff; font-weight:700;
+        border-radius:10px; padding:6px 10px; font-size:12px;
+    }
+
+    /* 无图时的装饰 */
+    .award-card__media.award--empty{
+        background:linear-gradient(135deg, #e9efff, #f4f7ff);
+    }
+    .award-card__media.award--empty .ico{
+        position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+        font-size:54px; color:#8aa1ff; opacity:.6;
+    }
+
+    /* 文本 */
+    .award-card__body{ padding:16px 18px 18px; }
+    .award-title{
+        font-size:18px; font-weight:800; line-height:1.35; margin:4px 0 8px; color:#1f2937;
+    }
+    .award-title a{ color:inherit; text-decoration:none; }
+    .award-title a:hover{ text-decoration:underline; }
+
+    .award-meta{ font-size:12px; color:#6b7280; margin-bottom:8px; }
+    .award-desc{
+        font-size:14px; color:#4b5563; line-height:1.6; margin:0 0 12px;
+        display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+    }
+
+    /* 标签与按钮 */
+    .tags{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
+    .tag{
+        background:#eef2ff; color:#3b5bcc; border-radius:999px;
+        padding:.25rem .6rem; font-weight:700; font-size:11px;
+    }
+    .card-actions{ display:flex; justify-content:space-between; align-items:center; gap:12px; }
+    .award-link{
+        display:inline-flex; align-items:center; gap:6px;
+        font-size:13px; font-weight:700; padding:8px 12px; border-radius:12px;
+        background:#e6eeff; color:#1f3a8a; text-decoration:none;
+    }
+    .award-link:hover{ filter:brightness(.95); text-decoration:none; }
+
+    /* 触屏与无动效偏好 */
+    @media (hover:none){
+        .award-card:hover{ transform:none; box-shadow:0 6px 18px rgba(0,0,0,.06); }
+        .award-card__media img{ transform:none; }
+    }
+    @media (prefers-reduced-motion:reduce){
+        *{ transition:none!important; animation:none!important; }
+    }
+
+    /* 暗色模式 */
+    @media (prefers-color-scheme: dark){
+        :root{ --card-bg:#0b1324; }
+        .award-card{ border-color:rgba(255,255,255,.06); box-shadow:none; }
+        .award-title{ color:#eef2ff; }
+        .award-desc{ color:#c7d2fe; }
+        .award-meta{ color:#9aa6ff; }
+        .tag{ background:#1f2a63; color:#c7d2fe; }
+        .award-link{ background:#1f2a63; color:#c7d2fe; }
+    }
+</style>
+
 <head>
-	<meta charset="UTF-8">
-	<meta name="description" content="NPU-IWC课题组">
-    <meta name="keywords" content="NPU-IWC课题组, yangbo">
-	<title>Honours and Awards</title>
-	
-	<!-- fonts -->
-	<link rel="preconnect" href="https://fonts.googleapis.com/">
-	<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
-	<link href="static/css/css2.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="description" content="NPU-IWC Research Group">
+    <meta name="keywords" content="NPU-IWC Research Group, yangbo">
+    <title>Honors & Awards</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com/">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+    <link href="static/css/css2.css" rel="stylesheet">
 
 
-	<link rel="stylesheet" href="static/css/bootstrap.min.css">
-	<link rel="stylesheet" href="static/css/animate.min.css">
-	<link rel="stylesheet" href="static/css/custom-animate.css">
-	<link rel="stylesheet" href="static/css/all.min.css">
-	<link rel="stylesheet" href="static/css/jarallax.css">
-	<link rel="stylesheet" href="static/css/jquery.magnific-popup.css">
-	<link rel="stylesheet" href="static/css/nouislider.min.css">
-	<link rel="stylesheet" href="static/css/nouislider.pips.css">
-	<link rel="stylesheet" href="static/css/odometer.min.css">
-	<link rel="stylesheet" href="static/css/swiper.min.css">
-	<link rel="stylesheet" href="static/css/style.css">
-	<link rel="stylesheet" href="static/css/tiny-slider.min.css">
-	<link rel="stylesheet" href="static/css/stylesheet.css">
-	<link rel="stylesheet" href="static/css/owl.carousel.min.css">
-	<link rel="stylesheet" href="static/css/owl.theme.default.min.css">
-	<link rel="stylesheet" href="static/css/twentytwenty.css">
-	<link rel="stylesheet" href="static/css/jquery.bxslider.css">
-	<link rel="stylesheet" href="static/css/bootstrap-select.min.css">
-	<link rel="stylesheet" href="static/css/vegas.min.css">
-	<link rel="stylesheet" href="static/css/jquery-ui.css">
-	<link rel="stylesheet" href="static/css/timePicker.css">
+    <link rel="stylesheet" href="static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="static/css/animate.min.css">
+    <link rel="stylesheet" href="static/css/custom-animate.css">
+    <link rel="stylesheet" href="static/css/all.min.css">
+    <link rel="stylesheet" href="static/css/jarallax.css">
+    <link rel="stylesheet" href="static/css/jquery.magnific-popup.css">
+    <link rel="stylesheet" href="static/css/nouislider.min.css">
+    <link rel="stylesheet" href="static/css/nouislider.pips.css">
+    <link rel="stylesheet" href="static/css/odometer.min.css">
+    <link rel="stylesheet" href="static/css/swiper.min.css">
+    <link rel="stylesheet" href="static/css/style.css">
+    <link rel="stylesheet" href="static/css/tiny-slider.min.css">
+    <link rel="stylesheet" href="static/css/stylesheet.css">
+    <link rel="stylesheet" href="static/css/owl.carousel.min.css">
+    <link rel="stylesheet" href="static/css/owl.theme.default.min.css">
+    <link rel="stylesheet" href="static/css/twentytwenty.css">
+    <link rel="stylesheet" href="static/css/jquery.bxslider.css">
+    <link rel="stylesheet" href="static/css/bootstrap-select.min.css">
+    <link rel="stylesheet" href="static/css/vegas.min.css">
+    <link rel="stylesheet" href="static/css/jquery-ui.css">
+    <link rel="stylesheet" href="static/css/timePicker.css">
 
-	<!-- template styles -->
-	<link rel="stylesheet" href="static/css/izeetak.css">
-	<link rel="stylesheet" href="static/css/izeetak-responsive.css">
+    <link rel="stylesheet" href="static/css/izeetak.css">
+    <link rel="stylesheet" href="static/css/izeetak-responsive.css">
+
+
 
 </head>
 
 <body>
-	<div class="preloader">
-		<img class="preloader__image" width="60" src="static/picture/loader.png" alt="">
-	</div>
-	<!-- /.preloader -->
-	<div class="page-wrapper">
-		<header class="main-header main-header-two clearfix">
-            <nav class="main-menu main-menu-two clearfix">
-                <div class="main-menu-wrapper clearfix">
-                    <div class="main-menu-wrapper-inner clearfix">
-                        <div class="main-menu-wrapper__left clearfix">
-                            <div class="main-menu-wrapper__logo">
-                                <img src="static/picture/logo-1.png" alt="">
-								<img src="static/picture/website_logo.png" alt="">	
-                            </div>
-                            <div class="main-menu-wrapper__main-menu">
-                                <a href="#" class="mobile-nav__toggler"><i class="fa fa-bars"></i></a>
-                                <ul class="main-menu__list">
-                                    <li>
-										<a href="index-en.html">home</a>
-									</li>
-									<li><a href="about-en.html">about</a></li>
-									<li><a href="news-en.html">news</a></li>
-									<li><a href="acdamic-en.html">acdamic</a></li>
-									<li><a href="project-en.html">project</a></li>
-									<li><a href="awards-en.html">awards</a></li>
-									<li class="dropdown">
-										<a href="#">member</a>
-										<ul>
-											<li><a href="member-phd-en.html">doctoral student</a></li>
-											<li><a href="member-en.html">master student</a></li>
-										</ul>
-									</li>
-									<li><a href="contact-en.html">contact</a></li>
-									<li><a href="awards.html">中文</a></li>
-                            </div>
+<div class="preloader">
+    <img class="preloader__image" width="60" src="static/picture/loader.png" alt="">
+</div>
+<div class="page-wrapper">
+    <header class="main-header main-header-two clearfix">
+        <nav class="main-menu main-menu-two clearfix">
+            <div class="main-menu-wrapper clearfix">
+                <div class="main-menu-wrapper-inner clearfix">
+                    <div class="main-menu-wrapper__left clearfix">
+                        <div class="main-menu-wrapper__logo">
+                            <img src="static/picture/logo-1.png" alt="">
+                            <img src="static/picture/website_logo.webp" alt="">
                         </div>
-                        
+                        <div class="main-menu-wrapper__main-menu">
+                            <a href="#" class="mobile-nav__toggler"><i class="fa fa-bars"></i></a>
+                            <ul class="main-menu__list">
+                                <li>
+                                    <a href="index-en.html">Home</a>
+                                </li>
+                                <li><a href="about-en.html">About</a></li>
+                                <li><a href="news-en.html">News</a></li>
+                                <li><a href="acdamic-en.html">Publications</a></li>
+                                <li><a href="project-en.html">Projects</a></li>
+                                <li><a href="awards-en.html">Awards</a></li>
+                                <li class="dropdown">
+                                    <a href="#">Members</a>
+                                    <ul>
+                                        <li><a href="member-phd-en.html">PhD Students</a></li>
+                                        <li><a href="member-en.html">Master Students</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="contact-en.html">Contact</a></li>
+                                <li><a href="awards.html">中文</a></li>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="stricky-header stricked-menu main-menu">
+        <div class="sticky-header__content"></div></div><section class="page-header">
+    <div class="page-header-bg" style="background-image: url(static/picture/background2.jpg)"></div>
+    <div class="container">
+        <div class="page-header__inner">
+            <ul class="thm-breadcrumb list-unstyled">
+                <li><a href="index.html">Home</a></li>
+                <li><span>/</span></li>
+                <li>Honors & Awards</li>
+            </ul>
+            <h2>Honors & Awards
+            </h2>
+        </div>
+    </div>
+</section>
+    <div class="container awards-wrap">
+        <div class="filters-bar">
+            <label for="year-select" class="mb-0">Filter by Year:</label>
+            <select id="year-select" class="form-select form-select-sm" style="max-width:200px;">
+                <option value="">All</option>
+                <option value="2025">2025</option>
+                <option value="2024">2024</option>
+                <option value="2023">2023</option>
+                <option value="2022">2022</option>
+                <option value="2021">2021</option>
+            </select>
+        </div>
+
+        <div class="awards-grid">
+
+            <article class="award-card" data-year="2025">
+                <div class="award-card__media">
+                    <span class="badge-year">2025</span>
+                    <img src="static/award/Ieee2025Han.jpg" alt="IEEE VTC2025-Spring Best Student Paper Award" loading="lazy" decoding="async" sizes="(max-width:767px) 100vw, (max-width:1199px) 50vw, 33vw">
+                </div>
+                <div class="award-card__body">
+                    <div class="award-meta">Issued by: IEEE VTC2025-Spring</div>
+                    <h3 class="award-title"><a href="#">Best Student Paper Award</a></h3>
+                    <div class="tags"><span class="tag">Team</span><span class="tag">Academic</span></div>
+                    <p class="award-desc">The paper received the Best Student Paper Award for its outstanding contributions and innovation.</p>
+                    <div class="card-actions">
+                        <span class="text-muted small">Date: 2025.06</span>
+                        <a class="award-link" href="#" target="_blank" rel="noopener">
+                            Certificate <i class="fa fa-arrow-right"></i>
+                        </a>
                     </div>
                 </div>
-            </nav>
-        </header>
+            </article>
 
-		<div class="stricky-header stricked-menu main-menu">
-			<div class="sticky-header__content"></div><!-- /.sticky-header__content -->
-		</div><!-- /.stricky-header -->
+            <article class="award-card" data-year="2024">
+                <div class="award-card__media">
+                    <span class="badge-year">2024</span>
+                    <img src="static/award/202412.jpeg" alt="2024 National Scholarship for Master's Students" loading="lazy" decoding="async" sizes="(max-width:767px) 100vw, (max-width:1199px) 50vw, 33vw">
+                </div>
+                <div class="award-card__body">
+                    <div class="award-meta">Issued by: Ministry of Education of P.R.C</div>
+                    <h3 class="award-title"><a href="#">National Scholarship for Master's Students</a></h3>
+                    <div class="tags"><span class="tag">Individual</span><span class="tag">Scholarship</span></div>
+                    <p class="award-desc">A group member received this national honor for excellent academic performance and research potential.</p>
+                    <div class="card-actions">
+                        <span class="text-muted small">Date: 2024.12</span>
+                        <a class="award-link" href="#" target="_blank" rel="noopener">
+                            Certificate <i class="fa fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </article>
 
-		<!--Page Header Start-->
-		<section class="page-header">
-			<div class="page-header-bg" style="background-image: url(static/picture/background2.jpg)"></div>
-			<div class="container">
-				<div class="page-header__inner">
-					<ul class="thm-breadcrumb list-unstyled">
-						<li><a href="index-en.html">home</a></li>
-						<li><span>/</span></li>
-						<li>awards</li>
-					</ul>
-					<h2>awards
-					</h2>
-				</div>
-			</div>
-		</section>
-		<!--Page Header End-->
-		<div class="container">
-			<header>
-				<label for="year-select">Select Year</label>
-				<select id="year-select">
-				  <option value="">all</option>
-				  <option value="2023">2023</option>
-				  <option value="2022">2022</option>
-				  <option value="2021">2021</option>
-				  <!-- 添加更多年份选项 -->
-				</select>
-			</header>
-			<main >
-				<ul style="line-height: 1.2;">
-				  <li style="margin-bottom: 10px;">
-					
-					<span class="year">2023</span>-
-					<span>best paper</span><br>
-					</li>
-				  <li style="margin-bottom: 10px;">
-					<span class="year">2022</span>-
-					<span>best paper</span><br>
-				</li >
-				  <li style="margin-bottom: 10px;">
-					<span class="year">2021</span>-
-					<span>best paper</span><br>
-				</li>
-				  <!-- 添加更多论文标题、年份和链接 -->
-				</ul>
-			  </main>
-			
-			  <script>
-				const yearSelect = document.getElementById('year-select');
-				const yearSpans = document.querySelectorAll('.year');
-			
-				yearSelect.addEventListener('change', () => {
-				  const selectedYear = yearSelect.value;
-			
-				  yearSpans.forEach(span => {
-					if (selectedYear === '' || selectedYear === span.textContent) {
-					  span.parentNode.style.display = 'block';
-					} else {
-					  span.parentNode.style.display = 'none';
-					}
-				  });
-				});
-			  </script>
-		</div>
-		
-
-	</div><!-- /.page-wrapper -->
-	
-	<div class="mobile-nav__wrapper">
-        <div class="mobile-nav__overlay mobile-nav__toggler"></div>
-        <!-- /.mobile-nav__overlay -->
-        <div class="mobile-nav__content">
-            <span class="mobile-nav__close mobile-nav__toggler"><i class="fa fa-times"></i></span>
-
-            <div class="logo-box">
-                <a href="index.html" aria-label="logo image"><img src="static/picture/website_logo.png" width="155" alt=""></a>
-            </div>
-            <!-- /.logo-box -->
-            <div class="mobile-nav__container"></div>
-            <!-- /.mobile-nav__container -->
         </div>
-        <!-- /.mobile-nav__content -->
     </div>
-    <!-- /.mobile-nav__wrapper -->
+
+    <script>
+        // Year filter functionality
+        (function(){
+            const yearSelect = document.getElementById('year-select');
+            const cards = document.querySelectorAll('.award-card');
+            const filter = () => {
+                const y = yearSelect.value;
+                cards.forEach(c => c.style.display = (!y || c.dataset.year === y) ? '' : 'none');
+            };
+            yearSelect.addEventListener('change', filter);
+            filter(); // Initial call
+        })();
+    </script>
 
 
+</div><div class="mobile-nav__wrapper">
+    <div class="mobile-nav__overlay mobile-nav__toggler"></div>
+    <div class="mobile-nav__content">
+        <span class="mobile-nav__close mobile-nav__toggler"><i class="fa fa-times"></i></span>
 
-	<script src="static/js/jquery-3.6.0.min.js"></script>
-	<script src="static/js/bootstrap.bundle.min.js"></script>
-	<script src="static/js/jarallax.min.js"></script>
-	<script src="static/js/jquery.ajaxchimp.min.js"></script>
-	<script src="static/js/jquery.appear.min.js"></script>
-	<script src="static/js/jquery.circle-progress.min.js"></script>
-	<script src="static/js/jquery.magnific-popup.min.js"></script>
-	<script src="static/js/jquery.validate.min.js"></script>
-	<script src="static/js/nouislider.min.js"></script>
-	<script src="static/js/odometer.min.js"></script>
-	<script src="static/js/swiper.min.js"></script>
-	<script src="static/js/tiny-slider.min.js"></script>
-	<script src="static/js/wNumb.min.js"></script>
-	<script src="static/js/wow.js"></script>
-	<script src="static/js/isotope.js"></script>
-	<script src="static/js/countdown.min.js"></script>
-	<script src="static/js/owl.carousel.min.js"></script>
-	<script src="static/js/twentytwenty.js"></script>
-	<script src="static/js/jquery.event.move.js"></script>
-	<script src="static/js/jquery.bxslider.min.js"></script>
-	<script src="static/js/bootstrap-select.min.js"></script>
-	<script src="static/js/vegas.min.js"></script>
-	<script src="static/js/jquery-ui.js"></script>
-	<script src="static/js/timePicker.js"></script>
+        <div class="logo-box">
+            <a href="index.html" aria-label="logo image"><img src="static/picture/website_logo.webp" width="155" alt=""></a>
+        </div>
+        <div class="mobile-nav__container"></div>
+    </div>
+</div>
+<script src="static/js/jquery-3.6.0.min.js"></script>
+<script src="static/js/bootstrap.bundle.min.js"></script>
+<script src="static/js/jarallax.min.js"></script>
+<script src="static/js/jquery.ajaxchimp.min.js"></script>
+<script src="static/js/jquery.appear.min.js"></script>
+<script src="static/js/jquery.circle-progress.min.js"></script>
+<script src="static/js/jquery.magnific-popup.min.js"></script>
+<script src="static/js/jquery.validate.min.js"></script>
+<script src="static/js/nouislider.min.js"></script>
+<script src="static/js/odometer.min.js"></script>
+<script src="static/js/swiper.min.js"></script>
+<script src="static/js/tiny-slider.min.js"></script>
+<script src="static/js/wNumb.min.js"></script>
+<script src="static/js/wow.js"></script>
+<script src="static/js/isotope.js"></script>
+<script src="static/js/countdown.min.js"></script>
+<script src="static/js/owl.carousel.min.js"></script>
+<script src="static/js/twentytwenty.js"></script>
+<script src="static/js/jquery.event.move.js"></script>
+<script src="static/js/jquery.bxslider.min.js"></script>
+<script src="static/js/bootstrap-select.min.js"></script>
+<script src="static/js/vegas.min.js"></script>
+<script src="static/js/jquery-ui.js"></script>
+<script src="static/js/timePicker.js"></script>
 
 
-	<script src="https://ditu.google.cn/maps/api/js?key=AIzaSyATY4Rxc8jNvDpsK8ZetC7JyN4PFVYGCGM"></script>
+<script src="https://ditu.google.cn/maps/api/js?key=AIzaSyATY4Rxc8jNvDpsK8ZetC7JyN4PFVYGCGM"></script>
 
 
-	<!-- template js -->
-	<script src="static/js/izeetak.js"></script>
+<script src="static/js/izeetak.js"></script>
 </body>
 
 </html>
