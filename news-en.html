@@ -1,14 +1,197 @@
 <!DOCTYPE html>
 <html lang="en">
 
+<style>
+    /* ===== News Cards ===== */
+    .news-grid{
+        display:grid;
+        grid-template-columns:repeat(12,1fr);
+        gap:24px;
+    }
+    @media (max-width:1199.98px){ .news-grid{grid-template-columns:repeat(8,1fr);} }
+    @media (max-width:767.98px){ .news-grid{grid-template-columns:repeat(4,1fr);} }
+
+    .news-card{
+        grid-column:span 4;                     /* 3-column card: 3 per row on desktop */
+        background:var(--card-bg,#ffffff);
+        border-radius:18px;
+        box-shadow:0 6px 18px rgba(0,0,0,.06);
+        overflow:hidden;
+        transition:transform .25s ease, box-shadow .25s ease;
+        border:1px solid rgba(0,0,0,.06);
+    }
+    @media (max-width:1199.98px){ .news-card{grid-column:span 4;} }  /* Tablet two columns */
+    @media (max-width:767.98px){ .news-card{grid-column:span 4;} }   /* Mobile one column */
+
+    .news-card__media{
+        position:relative;
+        aspect-ratio: 16/9;                      /* Uniform ratio, avoid layout shift */
+        overflow:hidden;
+        background:#f5f7fb;
+    }
+    .news-card__media img{
+        width:100%; height:100%;
+        object-fit:cover; object-position:center;
+        transition:transform .5s ease;
+        display:block;
+    }
+    .news-card:hover{ transform:translateY(-4px); box-shadow:0 10px 24px rgba(0,0,0,.10); }
+    .news-card:hover .news-card__media img{ transform:scale(1.05); }
+
+    .news-card__body{ padding:16px 18px 18px; }
+    .news-card__meta{
+        display:flex; flex-wrap:wrap; gap:10px; align-items:center;
+        font-size:12px; color:#6c757d;
+        margin-bottom:8px;
+    }
+    .badge-tag{
+        background:#eef2ff; color:#3b5bcc; border-radius:999px;
+        padding:.25rem .6rem; font-weight:600; font-size:11px;
+    }
+    .news-card__title{
+        font-size:18px; line-height:1.35; font-weight:700; margin:6px 0 8px;
+        color:#1f2937;
+    }
+    .news-card__title a{ color:inherit; text-decoration:none; }
+    .news-card__title a:hover{ text-decoration:underline; }
+
+    .news-card__excerpt{
+        color:#4b5563; font-size:14px; line-height:1.6; margin:0 0 12px;
+        min-height:3.2em; /* Two lines height, visual alignment */
+    }
+    .news-card__footer{
+        display:flex; align-items:center; justify-content:flex-end; /* <-- Changed to flex-end to align right */
+        gap:12px;
+    }
+    .news-card__btn{
+        display:inline-flex; align-items:center; gap:6px;
+        font-size:13px; font-weight:700;
+        padding:8px 12px; border-radius:12px;
+        text-decoration:none; color:#1f3a8a; background:#e6eeff;
+        cursor: pointer; /* <-- Ensure it's clickable */
+    }
+    .news-card__btn:hover{ filter:brightness(.95); text-decoration:none; }
+
+    /* Dark Mode (if your site has a night theme, you can reuse this) */
+    @media (prefers-color-scheme: dark){
+        :root{ --card-bg:#0b1324; }
+        .news-card{ border-color:rgba(255,255,255,.06); box-shadow:none; }
+        .news-card__title{ color:#eef2ff; }
+        .news-card__excerpt{ color:#c7d2fe; }
+        .news-card__meta{ color:#9aa6ff; }
+        .badge-tag{ background:#1f2a63; color:#c7d2fe; }
+        .news-card__btn{ background:#1f2a63; color:#c7d2fe; }
+    }
+
+
+    /* ===== Added CSS: Modal Styles ===== */
+    .news-modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Fixed position, cover fullscreen */
+        z-index: 1050; /* Ensure it's on top */
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow-y: auto; /* Scrollable if content is long */
+        background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent overlay */
+
+        /* Use Flex to center */
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+    /* 'show' class will make it visible */
+    .news-modal.show {
+        display: flex;
+    }
+    .news-modal__content {
+        background-color: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        width: 100%;
+        max-width: 700px; /* Modal max width */
+        position: relative;
+        overflow: hidden; /* For border-radius */
+        animation: modal-fade-in 0.3s ease-out; /* Simple entry animation */
+    }
+    .news-modal__close {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        font-size: 30px;
+        font-weight: 700;
+        line-height: 1;
+        color: #555;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+        z-index: 10; /* Above the image */
+        opacity: 0.7;
+        text-shadow: 0 1px 0 #fff; /* Clearer on light backgrounds */
+    }
+    .news-modal__close:hover {
+        opacity: 1;
+        color: #000;
+    }
+    .news-modal__media img {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 16/9; /* Same ratio as card */
+        object-fit: cover;
+        display: block; /* Remove bottom space */
+    }
+    .news-modal__body {
+        padding: 20px 30px 30px;
+    }
+    /* Modal title (bolded) */
+    .news-modal__body h3 {
+        font-size: 24px;
+        font-weight: 700;
+        margin-top: 0;
+        margin-bottom: 15px;
+        color: #1f2937;
+    }
+    /* Modal detail content */
+    .news-modal__body p {
+        font-size: 16px;
+        line-height: 1.7;
+        color: #4b5563;
+    }
+    .news-modal__body h4 {
+        font-size: 18px;
+        font-weight: 700;
+        color: #1f2937;
+        margin-top: 20px;
+        margin-bottom: 10px;
+    }
+
+    /* Simple entry animation */
+    @keyframes modal-fade-in {
+        from { opacity: 0; transform: translateY(-30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Dark mode compatibility */
+    @media (prefers-color-scheme: dark){
+        .news-modal__content { background-color: #0b1324; border: 1px solid rgba(255,255,255,.06); }
+        .news-modal__body h3 { color: #eef2ff; }
+        .news-modal__body h4 { color: #eef2ff; }
+        .news-modal__body p { color: #c7d2fe; }
+        .news-modal__close { color: #ccc; text-shadow: none; }
+        .news-modal__close:hover { color: #fff; }
+    }
+
+</style>
+
 <head>
     <meta charset="UTF-8">
-    <meta name="description" content="NPU-IWC课题组">
-    <meta name="keywords" content="NPU-IWC课题组, yangbo">
-    <title>新闻</title>
+    <meta name="description" content="NPU-IWC Research Group">
+    <meta name="keywords" content="NPU-IWC Research Group, yangbo">
+    <title>News</title>
 
 
-    <!-- fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com/">
     <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
     <link href="static/css/css2.css" rel="stylesheet">
@@ -36,164 +219,389 @@
     <link rel="stylesheet" href="static/css/jquery-ui.css">
     <link rel="stylesheet" href="static/css/timePicker.css">
 
-    <!-- template styles -->
     <link rel="stylesheet" href="static/css/izeetak.css">
     <link rel="stylesheet" href="static/css/izeetak-responsive.css">
 </head>
 
 <body>
-    <div class="preloader">
-        <img class="preloader__image" width="60" src="static/picture/loader.png" alt="">
-    </div>
-    <!-- /.preloader -->
-    <div class="page-wrapper">
-        <header class="main-header main-header-two clearfix">
-            <nav class="main-menu main-menu-two clearfix">
-                <div class="main-menu-wrapper clearfix">
-                    <div class="main-menu-wrapper-inner clearfix">
-                        <div class="main-menu-wrapper__left clearfix">
-                            <div class="main-menu-wrapper__logo">
-                                <img src="static/picture/logo-1.png" alt="">
-                                <img src="static/picture/website_logo.png" alt="">
-                            </div>
-                            <div class="main-menu-wrapper__main-menu">
-                                <a href="#" class="mobile-nav__toggler"><i class="fa fa-bars"></i></a>
-                                <ul class="main-menu__list">
-                                    <li>
-                                        <a href="index-en.html">home</a>
-                                    </li>
-                                    <li><a href="about-en.html">about</a></li>
-                                    <li><a href="news-en.html">news</a></li>
-                                    <li><a href="acdamic-en.html">acdamic</a></li>
-                                    <li><a href="project-en.html">project</a></li>
-                                    <li><a href="awards-en.html">awards</a></li>
-                                    <li class="dropdown">
-                                        <a href="#">member</a>
-                                        <ul>
-                                            <li><a href="member-phd-en.html">doctoral student</a></li>
-                                            <li><a href="member-en.html">master student</a></li>
-                                        </ul>
-                                    </li>
-                                    <li><a href="contact-en.html">contact</a></li>
-                                    <li><a href="news.html">中文</a></li>
-                            </div>
+<div class="preloader">
+    <img class="preloader__image" width="60" src="static/picture/loader.png" alt="">
+</div>
+<div class="page-wrapper">
+    <header class="main-header main-header-two clearfix">
+        <nav class="main-menu main-menu-two clearfix">
+            <div class="main-menu-wrapper clearfix">
+                <div class="main-menu-wrapper-inner clearfix">
+                    <div class="main-menu-wrapper__left clearfix">
+                        <div class="main-menu-wrapper__logo">
+                            <img src="static/picture/logo-1.png" alt="">
+
+                            <img src="static/picture/website_logo.png" alt="">
                         </div>
-                        
+                        <div class="main-menu-wrapper__main-menu">
+                            <a href="#" class="mobile-nav__toggler"><i class="fa fa-bars"></i></a>
+                            <ul class="main-menu__list">
+                                <li class="dropdown">
+                                    <a href="index.html">Home</a>
+                                </li>
+                                <li><a href="about.html">About</a></li>
+                                <li><a href="news.html">News</a></li>
+                                <li><a href="acdamic.html">Publications</a></li>
+                                <li><a href="project.html">Projects</a></li>
+                                <li><a href="awards.html">Awards</a></li>
+                                <li class="dropdown">
+                                    <a href="#">Members</a>
+                                    <ul>
+                                        <li><a href="member-phd.html">PhD Students</a></li>
+                                        <li><a href="member.html">Master Students</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="contact.html">Contact</a></li>
+                                <li><a href="news.html">中文</a></li> </div>
                     </div>
+
                 </div>
-            </nav>
-        </header>
-
-            <div class="stricky-header stricked-menu main-menu">
-                <div class="sticky-header__content"></div><!-- /.sticky-header__content -->
-            </div><!-- /.stricky-header -->
-
-            <!--Page Header Start-->
-            <section class="page-header">
-                <div class="page-header-bg" style="background-image: url(static/picture/background2.jpg)"></div>
-                <div class="container">
-                    <div class="page-header__inner">
-                        <ul class="thm-breadcrumb list-unstyled">
-                            <li><a href="index-en.html">home</a></li>
-                            <li><span>/</span></li>
-                            <li>news</li>
-                        </ul>
-                        <h2>latest news</h2>
-                    </div>
-                </div>
-            </section>
-            <!--Page Header End-->
-
-            <!--News Page Start-->
-            <section class="news-one news-page">
-                <div class="container">
-                    <div class="row">
-                        
-                        <table class="table table-hover table-bordered table-striped table-sm align-middle">
-                            <!-- 表头 -->
-                            <thead class="thead-dark">
-                                <tr >
-                                    <th scope="col" style="text-align: center; width: 150px;">time</th>
-                                    <th  scope="col" style="text-align: center;width: auto;">content</th>
-                                </tr>
-                            </thead>
-                              <!-- 表内容 -->
-                            <tbody>
-                                <tr>
-                                    <td style="text-align: center;">2023.12</td>
-                                    <td style="text-align: center;">Congratulations to Ruihuai Liang for his paper accepted by GLOBEMCOM2023!</td>
-                                </tr>
-                                <tr>
-                                    <td style="text-align: center;">2023.10</td>
-                                    <td style="text-align: center;">Congratulations to Siyu Wang for having her paper accepted by CWSN2023!</td>
-                                </tr>
-                                <tr>
-                                    <td style="text-align: center;">2023.09</td>
-                                    <td style="text-align: center;">Welcome Kaining Wang, Hao Liu, Siyu Wang, Ruihuai Liang, Runxin Han and Ting Zhang to join the group.</td>
-                                </tr>
-                                <tr>
-                                    <td style="text-align: center;">2023.09</td>
-                                    <td style="text-align: center;">Establishment of Research Group</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-            <!--News Page End-->
-
-
-        </div><!-- /.page-wrapper -->
-
-
-        <div class="mobile-nav__wrapper">
-            <div class="mobile-nav__overlay mobile-nav__toggler"></div>
-            <!-- /.mobile-nav__overlay -->
-            <div class="mobile-nav__content">
-                <span class="mobile-nav__close mobile-nav__toggler"><i class="fa fa-times"></i></span>
-    
-                <div class="logo-box">
-                    <a href="index.html" aria-label="logo image"><img src="static/picture/website_logo.png" width="155" alt=""></a>
-                </div>
-                <!-- /.logo-box -->
-                <div class="mobile-nav__container"></div>
-                <!-- /.mobile-nav__container -->
             </div>
-            <!-- /.mobile-nav__content -->
+        </nav>
+    </header>
+
+    <div class="stricky-header stricked-menu main-menu">
+        <div class="sticky-header__content"></div></div><section class="page-header">
+    <div class="page-header-bg" style="background-image: url(static/picture/background2.jpg)"></div>
+    <div class="container">
+        <div class="page-header__inner">
+            <ul class="thm-breadcrumb list-unstyled">
+                <li><a href="index.html">Home</a></li>
+                <li><span>/</span></li>
+                <li>News</li>
+            </ul>
+            <h2>Recent News</h2>
         </div>
-        <!-- /.mobile-nav__wrapper -->
+    </div>
+</section>
+    <section class="news-one news-page">
+        <div class="container">
+            <div class="row">
+                <div class="news-grid">
 
-        <script src="static/js/jquery-3.6.0.min.js"></script>
-        <script src="static/js/bootstrap.bundle.min.js"></script>
-        <script src="static/js/jarallax.min.js"></script>
-        <script src="static/js/jquery.ajaxchimp.min.js"></script>
-        <script src="static/js/jquery.appear.min.js"></script>
-        <script src="static/js/jquery.circle-progress.min.js"></script>
-        <script src="static/js/jquery.magnific-popup.min.js"></script>
-        <script src="static/js/jquery.validate.min.js"></script>
-        <script src="static/js/nouislider.min.js"></script>
-        <script src="static/js/odometer.min.js"></script>
-        <script src="static/js/swiper.min.js"></script>
-        <script src="static/js/tiny-slider.min.js"></script>
-        <script src="static/js/wNumb.min.js"></script>
-        <script src="static/js/wow.js"></script>
-        <script src="static/js/isotope.js"></script>
-        <script src="static/js/countdown.min.js"></script>
-        <script src="static/js/owl.carousel.min.js"></script>
-        <script src="static/js/twentytwenty.js"></script>
-        <script src="static/js/jquery.event.move.js"></script>
-        <script src="static/js/jquery.bxslider.min.js"></script>
-        <script src="static/js/bootstrap-select.min.js"></script>
-        <script src="static/js/vegas.min.js"></script>
-        <script src="static/js/jquery-ui.js"></script>
-        <script src="static/js/timePicker.js"></script>
+                    <article class="news-card">
+                        <div class="news-card__media">
+                            <img src="static/picture/2024party.jpg" alt="T-IFS Acceptance">
+                        </div>
+                        <div class="news-card__body">
+                            <div class="news-card__meta">
+                                <span>2024.08</span>
+                                <span class="badge-tag">Paper Accepted</span>
+                            </div>
+                            <h3 class="news-card__title">
+                                <a href="#">Congratulations to Liu Hao on his paper being accepted by T-IFS</a>
+                            </h3>
+                            <p class="news-card__excerpt">The team has made new progress in IoT security, with a paper accepted by IEEE T-IFS.</p>
+                            <div class="news-card__footer">
+                                <a class="news-card__btn" href="javascript:void(0);">View Details</a>
+                            </div>
+
+                            <div class="news-card__details" style="display:none;">
+                                <p>The team has made new progress in IoT security, and the paper "A Novel Approach to IoT Security" has been accepted by IEEE T-IFS.</p>
+                            </div>
+
+                        </div>
+                    </article>
+
+                    <article class="news-card">
+                        <div class="news-card__media">
+                            <img src="static/picture/2024party.jpg" alt="ICWS 2024">
+                        </div>
+                        <div class="news-card__body">
+                            <div class="news-card__meta">
+                                <span>2024.06</span>
+                                <span class="badge-tag">Academic Activity</span>
+                            </div>
+                            <h3 class="news-card__title">
+                                <a href="#">Professor Bo Yang Invited to ICWS 2024</a>
+                            </h3>
+                            <p class="news-card__excerpt">Professor Bo Yang was invited to give a keynote speech at the ICWS 2024 conference.</p>
+                            <div class="news-card__footer">
+                                <a class="news-card__btn" href="javascript:void(0);">View Details</a>
+                            </div>
+
+                            <div class="news-card__details" style="display:none;">
+                                <p>Professor Bo Yang was invited to give a keynote speech at the ICWS 2024 conference.</p>
+                            </div>
+
+                        </div>
+                    </article>
+
+                    <article class="news-card">
+                        <div class="news-card__media">
+                            <img src="static/picture/2024party.jpg" alt="National Scholarship">
+                        </div>
+                        <div class="news-card__body">
+                            <div class="news-card__meta">
+                                <span>2024.05</span>
+                                <span class="badge-tag">Award News</span>
+                            </div>
+                            <h3 class="news-card__title">
+                                <a href="#">Congratulations to Han Runxin on receiving the National Scholarship</a>
+                            </h3>
+                            <p class="news-card__excerpt">Warm congratulations to Han Runxin, a 2023-level master's student in our group, on winning the 2023-2024 academic year National Scholarship for Graduate Students.</p>
+                            <div class="news-card__footer">
+                                <a class="news-card__btn" href="javascript:void(0);">View Details</a>
+                            </div>
+
+                            <div class="news-card__details" style="display:none;">
+                                <p>Warm congratulations to Han Runxin, a 2023-level master's student in our group, on winning the 2023-2024 academic year National Scholarship for Graduate Students.</p>
+                            </div>
+
+                        </div>
+                    </article>
+
+                    <article class="news-card">
+                        <div class="news-card__media">
+                            <img src="static/picture/2024party.jpg" alt="NSFC Project">
+                        </div>
+                        <div class="news-card__body">
+                            <div class="news-card__meta">
+                                <span>2024.03</span>
+                                <span class="badge-tag">Project Approval</span>
+                            </div>
+                            <h3 class="news-card__title">
+                                <a href="#">Research Group's NSFC Project Approved</a>
+                            </h3>
+                            <p class="news-card__excerpt">The group's "xxx" project was successfully approved for the 2024 National Natural Science Foundation of China (NSFC) Youth Project.</p>
+                            <div class="news-card__footer">
+                                <a class="news-card__btn" href="javascript:void(0);">View Details</a>
+                            </div>
+
+                            <div class="news-card__details" style="display:none;">
+                                <p>The group's "xxx" project was successfully approved for the 2024 National Natural Science Foundation of China (NSFC) Youth Project.</p>
+                            </div>
+
+                        </div>
+                    </article>
+
+                    <article class="news-card">
+                        <div class="news-card__media">
+                            <img src="static/picture/2024party.jpg" alt="GLOBECOM 2023 Acceptance">
+                        </div>
+                        <div class="news-card__body">
+                            <div class="news-card__meta">
+                                <span>2023.12</span>
+                                <span class="badge-tag">Paper Accepted</span>
+                            </div>
+                            <h3 class="news-card__title">
+                                <a href="#">Congratulations to Liang Ruihuai on his paper being accepted by GLOBECOM 2023</a>
+                            </h3>
+                            <p class="news-card__excerpt">The team has made new progress in wireless communication security, with a paper accepted by IEEE GLOBECOM.</p>
+                            <div class="news-card__footer">
+                                <a class="news-card__btn" href="javascript:void(0);">View Details</a>
+                            </div>
+
+                            <div class="news-card__details" style="display:none;">
+                                <p>The team has made new progress in wireless communication security, and the paper has been accepted by IEEE GLOBECOM.</p>
+                            </div>
+
+                        </div>
+                    </article>
+
+                    <article class="news-card">
+                        <div class="news-card__media">
+                            <img src="static/picture/2024party.jpg" alt="CWSN 2023 Acceptance">
+
+                        </div>
+                        <div class="news-card__body">
+                            <div class="news-card__meta">
+                                <span>2023.10</span>
+                                <span class="badge-tag">Conference</span>
+                            </div>
+                            <h3 class="news-card__title">
+                                <a href="#">Congratulations to Wang Siyu on her paper being accepted by CWSN 2023</a>
+                            </h3>
+                            <p class="news-card__excerpt">A collaborative sensing method for IoT security received reviewer recognition and was successfully accepted.</p>
+                            <div class="news-card__footer">
+                                <a class="news-card__btn" href="javascript:void(0);">View Details</a>
+                            </div>
+
+                            <div class="news-card__details" style="display:none;">
+                                <p>The collaborative sensing method for IoT security received reviewer recognition and was successfully accepted.</p>
+                            </div>
+
+                        </div>
+                    </article>
+
+                    <article class="news-card">
+                        <div class="news-card__media">
+                            <img src="static/picture/2024party.jpg" alt="New Students Join">
+
+                        </div>
+                        <div class="news-card__body">
+                            <div class="news-card__meta">
+                                <span>2023.09</span>
+                                <span class="badge-tag">Welcome</span>
+                            </div>
+                            <h3 class="news-card__title">
+                                <a href="#">Welcome Wang Kaining, Liu Hao, Wang Siyu, Liang Ruihuai, Han Runxin, and Zhang Ting to the research group</a>
+                            </h3>
+                            <p class="news-card__excerpt">We look forward to making progress and growing together in our future research and studies.</p>
+                            <div class="news-card__footer">
+                                <a class="news-card__btn" href="javascript:void(0);">View Details</a>
+                            </div>
+
+                            <div class="news-card__details" style="display:none;">
+                                <p>We look forward to making progress and growing together in our future research and studies.</p>
+                            </div>
+
+                        </div>
+                    </article>
+
+                    <article class="news-card">
+                        <div class="news-card__media">
+                            <img src="static/picture/2024party.jpg" alt="Group Established">
+                        </div>
+                        <div class="news-card__body">
+                            <div class="news-card__meta">
+                                <span>2023.09</span>
+                                <span class="badge-tag">Milestone</span>
+                            </div>
+                            <h3 class="news-card__title">
+                                <a href="#">Group Established</a>
+                            </h3>
+                            <p class="news-card__excerpt">The NPU-IWC research group is officially established, focusing on research in wireless communication and security.</p>
+                            <div class="news-card__footer">
+                                <a class="news-card__btn" href="javascript:void(0);">View Details</a>
+                            </div>
+
+                            <div class="news-card__details" style="display:none;">
+                                <p>The NPU-IWC research group is officially established, focusing on research in wireless communication and security.</p>
+                            </div>
+
+                        </div>
+                    </article>
+
+                </div>
+            </div>
+        </div>
+    </section>
+    <div class="news-modal" id="newsModal">
+        <div class="news-modal__content">
+            <button class="news-modal__close" id="modalCloseBtn">&times;</button>
+
+            <div class="news-modal__media">
+                <img src="" alt="News Image" id="modalImage">
+            </div>
+
+            <div class="news-modal__body">
+                <h3 id="modalTitle"></h3>
+                <div id="modalDetailContent">
+                </div>
+            </div>
+        </div>
+    </div>
+</div><div class="mobile-nav__wrapper">
+    <div class="mobile-nav__overlay mobile-nav__toggler"></div>
+    <div class="mobile-nav__content">
+        <span class="mobile-nav__close mobile-nav__toggler"><i class="fa fa-times"></i></span>
+
+        <div class="logo-box">
+            <a href="index.html" aria-label="logo image"><img src="static/picture/website_logo.png" width="155" alt=""></a>
+        </div>
+        <div class="mobile-nav__container"></div>
+    </div>
+</div>
+<script src="static/js/jquery-3.6.0.min.js"></script>
+<script src="static/js/bootstrap.bundle.min.js"></script>
+<script src="static/js/jarallax.min.js"></script>
+<script src="static/js/jquery.ajaxchimp.min.js"></script>
+<script src="static/js/jquery.appear.min.js"></script>
+<script src="static/js/jquery.circle-progress.min.js"></script>
+<script src="static/js/jquery.magnific-popup.min.js"></script>
+<script src="static/js/jquery.validate.min.js"></script>
+<script src="static/js/nouislider.min.js"></script>
+<script src="static/js/odometer.min.js"></script>
+<script src="static/js/swiper.min.js"></script>
+<script src="static/js/tiny-slider.min.js"></script>
+<script src="static/js/wNumb.min.js"></script>
+<script src="static/js/wow.js"></script>
+<script src="static/js/isotope.js"></script>
+<script src="static/js/countdown.min.js"></script>
+<script src="static/js/owl.carousel.min.js"></script>
+<script src="static/js/twentytwenty.js"></script>
+<script src="static/js/jquery.event.move.js"></script>
+<script src="static/js/jquery.bxslider.min.js"></script>
+<script src="static/js/bootstrap-select.min.js"></script>
+<script src="static/js/vegas.min.js"></script>
+<script src="static/js/jquery-ui.js"></script>
+<script src="static/js/timePicker.js"></script>
 
 
-        <script src="https://ditu.google.cn/maps/api/js?key=AIzaSyATY4Rxc8jNvDpsK8ZetC7JyN4PFVYGCGM"></script>
+<script src="https://ditu.google.cn/maps/api/js?key=AIzaSyATY4Rxc8jNvDpsK8ZetC7JyN4PFVYGCGM"></script>
 
 
-        <!-- template js -->
-        <script src="static/js/izeetak.js"></script>
+<script src="static/js/izeetak.js"></script>
+
+<script>
+    // Ensure DOM is fully loaded before executing script
+    document.addEventListener('DOMContentLoaded', function() {
+
+        // 1. Get the modal and its key components
+        const modal = document.getElementById('newsModal');
+        const modalCloseBtn = document.getElementById('modalCloseBtn');
+        const modalImage = document.getElementById('modalImage');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalDetailContent = document.getElementById('modalDetailContent');
+
+        // 2. Get all "View Details" buttons
+        const detailButtons = document.querySelectorAll('.news-card__btn');
+
+        // 3. Add click event listener to each button
+        detailButtons.forEach(button => {
+            button.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent <a> tag's default behavior
+
+                // a. Find the .news-card parent of the clicked button
+                const card = this.closest('.news-card');
+
+                // b. Extract data from the card
+                const imageSrc = card.querySelector('.news-card__media img').src;
+                const title = card.querySelector('.news-card__title a').innerText;
+                const detailsHTML = card.querySelector('.news-card__details').innerHTML;
+
+                // c. Populate the modal with the data
+                modalImage.src = imageSrc;
+                modalTitle.innerText = title;
+                modalDetailContent.innerHTML = detailsHTML;
+
+                // d. Show the modal (by adding 'show' class)
+                modal.classList.add('show');
+            });
+        });
+
+        // 4. Define the function to close the modal
+        function closeModal() {
+            modal.classList.remove('show');
+        }
+
+        // 5. Bind close events
+        // a. Click the close button (X)
+        modalCloseBtn.addEventListener('click', closeModal);
+
+        // b. Click the modal overlay (outside the content)
+        modal.addEventListener('click', function(event) {
+            // Check if the click is on the overlay itself
+            if (event.target === modal) {
+                closeModal();
+            }
+        });
+
+        // c. Respond to 'Escape' key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && modal.classList.contains('show')) {
+                closeModal();
+            }
+        });
+
+    });
+</script>
 </body>
 
 </html>
