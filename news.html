@@ -60,15 +60,13 @@
         min-height:3.2em; /* 两行高度，视觉整齐 */
     }
     .news-card__footer{
-        display:flex; align-items:center; justify-content:flex-end; /* <-- 更改为flex-end使其靠右 */
-        gap:12px;
+        display:flex; align-items:center; justify-content:space-between; gap:12px;
     }
     .news-card__btn{
         display:inline-flex; align-items:center; gap:6px;
         font-size:13px; font-weight:700;
         padding:8px 12px; border-radius:12px;
         text-decoration:none; color:#1f3a8a; background:#e6eeff;
-        cursor: pointer; /* <-- 确保显示为可点击 */
     }
     .news-card__btn:hover{ filter:brightness(.95); text-decoration:none; }
 
@@ -82,107 +80,6 @@
         .badge-tag{ background:#1f2a63; color:#c7d2fe; }
         .news-card__btn{ background:#1f2a63; color:#c7d2fe; }
     }
-
-
-    /* ===== 新增CSS：弹窗样式 ===== */
-    .news-modal {
-        display: none; /* 默认隐藏 */
-        position: fixed; /* 固定定位，覆盖全屏 */
-        z-index: 1050; /* 确保在顶层 (Bootstrap modal a z-index 1050) */
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        overflow-y: auto; /* 内容过长时可滚动 */
-        background-color: rgba(0, 0, 0, 0.6); /* 半透明遮罩 */
-
-        /* 使用 Flex 居中 */
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-    }
-    /* 'show' 类将使其可见 */
-    .news-modal.show {
-        display: flex;
-    }
-    .news-modal__content {
-        background-color: #ffffff;
-        border-radius: 12px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        width: 100%;
-        max-width: 700px; /* 弹窗最大宽度 */
-        position: relative;
-        overflow: hidden; /* 配合圆角 */
-        animation: modal-fade-in 0.3s ease-out; /* 简单的进入动画 */
-    }
-    .news-modal__close {
-        position: absolute;
-        top: 10px;
-        right: 15px;
-        font-size: 30px;
-        font-weight: 700;
-        line-height: 1;
-        color: #555;
-        background: none;
-        border: none;
-        cursor: pointer;
-        padding: 0;
-        z-index: 10; /* 在图片上层 */
-        opacity: 0.7;
-        text-shadow: 0 1px 0 #fff; /* 在亮色背景上更清晰 */
-    }
-    .news-modal__close:hover {
-        opacity: 1;
-        color: #000;
-    }
-    .news-modal__media img {
-        width: 100%;
-        height: auto;
-        aspect-ratio: 16/9; /* 保持和卡片一致的比例 */
-        object-fit: cover;
-        display: block; /* 移除图片底部的空白 */
-    }
-    .news-modal__body {
-        padding: 20px 30px 30px;
-    }
-    /* 弹窗内的标题 (已加粗) */
-    .news-modal__body h3 {
-        font-size: 24px;
-        font-weight: 700;
-        margin-top: 0;
-        margin-bottom: 15px;
-        color: #1f2937;
-    }
-    /* 弹窗内的详细内容 */
-    .news-modal__body p {
-        font-size: 16px;
-        line-height: 1.7;
-        color: #4b5563;
-    }
-    .news-modal__body h4 {
-        font-size: 18px;
-        font-weight: 700;
-        color: #1f2937;
-        margin-top: 20px;
-        margin-bottom: 10px;
-    }
-
-    /* 简单的进入动画 */
-    @keyframes modal-fade-in {
-        from { opacity: 0; transform: translateY(-30px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* 适配暗色模式 */
-    @media (prefers-color-scheme: dark){
-        .news-modal__content { background-color: #0b1324; border: 1px solid rgba(255,255,255,.06); }
-        .news-modal__body h3 { color: #eef2ff; }
-        .news-modal__body h4 { color: #eef2ff; }
-        .news-modal__body p { color: #c7d2fe; }
-        .news-modal__close { color: #ccc; text-shadow: none; }
-        .news-modal__close:hover { color: #fff; }
-    }
-
 </style>
 
 <head>
@@ -192,6 +89,7 @@
     <title>新闻</title>
 
 
+    <!-- fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com/">
     <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
     <link href="static/css/css2.css" rel="stylesheet">
@@ -219,6 +117,7 @@
     <link rel="stylesheet" href="static/css/jquery-ui.css">
     <link rel="stylesheet" href="static/css/timePicker.css">
 
+    <!-- template styles -->
     <link rel="stylesheet" href="static/css/izeetak.css">
     <link rel="stylesheet" href="static/css/izeetak-responsive.css">
 </head>
@@ -227,6 +126,7 @@
 <div class="preloader">
     <img class="preloader__image" width="60" src="static/picture/loader.png" alt="">
 </div>
+<!-- /.preloader -->
 <div class="page-wrapper">
     <header class="main-header main-header-two clearfix">
         <nav class="main-menu main-menu-two clearfix">
@@ -267,19 +167,26 @@
     </header>
 
     <div class="stricky-header stricked-menu main-menu">
-        <div class="sticky-header__content"></div></div><section class="page-header">
-    <div class="page-header-bg" style="background-image: url(static/picture/background2.jpg)"></div>
-    <div class="container">
-        <div class="page-header__inner">
-            <ul class="thm-breadcrumb list-unstyled">
-                <li><a href="index.html">主页</a></li>
-                <li><span>/</span></li>
-                <li>新闻</li>
-            </ul>
-            <h2>近期新闻</h2>
+        <div class="sticky-header__content"></div><!-- /.sticky-header__content -->
+    </div><!-- /.stricky-header -->
+
+    <!--Page Header Start-->
+    <section class="page-header">
+        <div class="page-header-bg" style="background-image: url(static/picture/background2.jpg)"></div>
+        <div class="container">
+            <div class="page-header__inner">
+                <ul class="thm-breadcrumb list-unstyled">
+                    <li><a href="index.html">主页</a></li>
+                    <li><span>/</span></li>
+                    <li>新闻</li>
+                </ul>
+                <h2>近期新闻</h2>
+            </div>
         </div>
-    </div>
-</section>
+    </section>
+    <!--Page Header End-->
+
+    <!--News Page Start-->
     <section class="news-one news-page">
         <div class="container">
             <div class="row">
@@ -287,100 +194,67 @@
 
                     <article class="news-card">
                         <div class="news-card__media">
-                            <img src="static/picture/2024party.jpg" alt="T-IFS 接收">
+                            <img src="static/picture/2025Xueyao.png" alt="IEEE TITS 论文接收">
                         </div>
                         <div class="news-card__body">
                             <div class="news-card__meta">
-                                <span>2024.08</span>
+                                <span>2025.11</span>
                                 <span class="badge-tag">论文接收</span>
                             </div>
                             <h3 class="news-card__title">
-                                <a href="#">祝贺刘豪同学论文被 T-IFS 接收</a>
+                                <a href="#">祝贺张雪瑶同学论文被 IEEE TITS 接收</a>
                             </h3>
-                            <p class="news-card__excerpt">团队在物联网安全方向取得新进展，论文被 IEEE T-IFS 录用。</p>
+                            <p class="news-card__excerpt">团队在安全自动驾驶网络方向取得新进展，论文在 IEEE TITS 上发布。</p>
                             <div class="news-card__footer">
-                                <a class="news-card__btn" href="javascript:void(0);">查看详情</a>
+                                <span class="text-muted small">阅读约 1 分钟</span>
+                                <a class="news-card__btn" href="#">查看详情
+                                    <i class="fa fa-arrow-right" aria-hidden="true"></i>
+                                </a>
                             </div>
-
-                            <div class="news-card__details" style="display:none;">
-                                <p>团队在物联网安全方向取得新进展，论文“A Novel Approach to IoT Security”被IEEE T-IFS录用。</p>
-                            </div>
-
                         </div>
                     </article>
 
                     <article class="news-card">
                         <div class="news-card__media">
-                            <img src="static/picture/2024party.jpg" alt="ICWS 2024">
+                            <img src="static/picture/2025teacherDay.jpg" alt="新同学加入">
                         </div>
                         <div class="news-card__body">
                             <div class="news-card__meta">
-                                <span>2024.06</span>
-                                <span class="badge-tag">学术活动</span>
+                                <span>2025.09</span>
+                                <span class="badge-tag">迎新</span>
                             </div>
                             <h3 class="news-card__title">
-                                <a href="#">杨博教授受邀参加 ICWS 2024</a>
+                                <a href="#">欢迎吴珺海、闫晨扬、李先进、薛一凡同学加入课题组</a>
                             </h3>
-                            <p class="news-card__excerpt">杨博教授受邀在 ICWS 2024 会议上作特邀报告。</p>
+                            <p class="news-card__excerpt">期待在未来的科研学习中携手进步、共同成长</p>
                             <div class="news-card__footer">
-                                <a class="news-card__btn" href="javascript:void(0);">查看详情</a>
+                                <span class="text-muted small">阅读约 30 秒</span>
+                                <a class="news-card__btn" href="#">照片集 <i class="fa fa-image"></i></a>
                             </div>
-
-                            <div class="news-card__details" style="display:none;">
-                                <p>杨博教授受邀在ICWS 2024会议上作特邀报告。</p>
-                            </div>
-
                         </div>
                     </article>
 
                     <article class="news-card">
                         <div class="news-card__media">
-                            <img src="static/picture/2024party.jpg" alt="国家奖学金">
+                            <img src="static/picture/2025VTC.png" alt="IEEE VTC2025-Spring会议">
                         </div>
                         <div class="news-card__body">
                             <div class="news-card__meta">
-                                <span>2024.05</span>
-                                <span class="badge-tag">获奖喜报</span>
+                                <span>2025.06</span>
+                                <span class="badge-tag">会议</span>
                             </div>
                             <h3 class="news-card__title">
-                                <a href="#">祝贺韩润心同学获国家奖学金</a>
+                                <a href="#">杨博教授参加IEEE VTC2025-Spring会议</a>
                             </h3>
-                            <p class="news-card__excerpt">热烈祝贺我组2023级硕士生韩润心同学荣获2023-2024学年硕士研究生国家奖学金。</p>
+                            <p class="news-card__excerpt">2025年6月17日至20日，杨博教授参加了在挪威举办的IEEE第101届VTC会议。</p>
                             <div class="news-card__footer">
-                                <a class="news-card__btn" href="javascript:void(0);">查看详情</a>
+                                <span class="text-muted small">阅读约 1 分钟</span>
+                                <a class="news-card__btn" href="#">查看详情 <i class="fa fa-arrow-right"></i></a>
                             </div>
-
-                            <div class="news-card__details" style="display:none;">
-                                <p>热烈祝贺我组2023级硕士生韩润心同学荣获2023-2024学年硕士研究生国家奖学金。</p>
-                            </div>
-
                         </div>
                     </article>
 
-                    <article class="news-card">
-                        <div class="news-card__media">
-                            <img src="static/picture/2024party.jpg" alt="国家自然科学基金项目">
-                        </div>
-                        <div class="news-card__body">
-                            <div class="news-card__meta">
-                                <span>2024.03</span>
-                                <span class="badge-tag">项目立项</span>
-                            </div>
-                            <h3 class="news-card__title">
-                                <a href="#">课题组获批国家自然科学基金项目</a>
-                            </h3>
-                            <p class="news-card__excerpt">课题组“xxx”项目成功获批2024年度国家自然科学基金青年项目。</p>
-                            <div class="news-card__footer">
-                                <a class="news-card__btn" href="javascript:void(0);">查看详情</a>
-                            </div>
-
-                            <div class="news-card__details" style="display:none;">
-                                <p>课题组“xxx”项目成功获批2024年度国家自然科学基金青年项目。</p>
-                            </div>
-
-                        </div>
-                    </article>
-
+                    <!-- 卡片 1 -->
                     <article class="news-card">
                         <div class="news-card__media">
                             <img src="static/picture/2024party.jpg" alt="GLOBECOM 2023 接收">
@@ -395,16 +269,15 @@
                             </h3>
                             <p class="news-card__excerpt">团队在无线通信安全方向取得新进展，论文被 IEEE GLOBECOM 录用。</p>
                             <div class="news-card__footer">
-                                <a class="news-card__btn" href="javascript:void(0);">查看详情</a>
+                                <span class="text-muted small">阅读约 1 分钟</span>
+                                <a class="news-card__btn" href="#">查看详情
+                                    <i class="fa fa-arrow-right" aria-hidden="true"></i>
+                                </a>
                             </div>
-
-                            <div class="news-card__details" style="display:none;">
-                                <p>团队在无线通信安全方向取得新进展，论文被IEEE GLOBECOM录用。</p>
-                            </div>
-
                         </div>
                     </article>
 
+                    <!-- 卡片 2 -->
                     <article class="news-card">
                         <div class="news-card__media">
                             <img src="static/picture/2024party.jpg" alt="CWSN 2023 接收">
@@ -420,16 +293,13 @@
                             </h3>
                             <p class="news-card__excerpt">面向物联网安全的协作感知方法获得评审认可，顺利录用。</p>
                             <div class="news-card__footer">
-                                <a class="news-card__btn" href="javascript:void(0);">查看详情</a>
+                                <span class="text-muted small">阅读约 1 分钟</span>
+                                <a class="news-card__btn" href="#">查看详情 <i class="fa fa-arrow-right"></i></a>
                             </div>
-
-                            <div class="news-card__details" style="display:none;">
-                                <p>面向物联网安全的协作感知方法获得评审认可，顺利录用。</p>
-                            </div>
-
                         </div>
                     </article>
 
+                    <!-- 卡片 3 -->
                     <article class="news-card">
                         <div class="news-card__media">
                             <img src="static/picture/2024party.jpg" alt="新同学加入">
@@ -445,16 +315,13 @@
                             </h3>
                             <p class="news-card__excerpt">期待在未来的科研学习中携手进步、共同成长。</p>
                             <div class="news-card__footer">
-                                <a class="news-card__btn" href="javascript:void(0);">查看详情</a>
+                                <span class="text-muted small">阅读约 30 秒</span>
+                                <a class="news-card__btn" href="#">照片集 <i class="fa fa-image"></i></a>
                             </div>
-
-                            <div class="news-card__details" style="display:none;">
-                                <p>期待在未来的科研学习中携手进步、共同成长。</p>
-                            </div>
-
                         </div>
                     </article>
 
+                    <!-- 卡片 4 -->
                     <article class="news-card">
                         <div class="news-card__media">
                             <img src="static/picture/2024party.jpg" alt="课题组成立">
@@ -469,13 +336,9 @@
                             </h3>
                             <p class="news-card__excerpt">NPU‑IWC 课题组正式成立，面向无线通信与安全方向开展研究。</p>
                             <div class="news-card__footer">
-                                <a class="news-card__btn" href="javascript:void(0);">查看详情</a>
+                                <span class="text-muted small">阅读约 20 秒</span>
+                                <a class="news-card__btn" href="#">了解更多 <i class="fa fa-info-circle"></i></a>
                             </div>
-
-                            <div class="news-card__details" style="display:none;">
-                                <p>NPU-IWC课题组正式成立，面向无线通信与安全方向开展研究。</p>
-                            </div>
-
                         </div>
                     </article>
 
@@ -483,32 +346,29 @@
             </div>
         </div>
     </section>
-    <div class="news-modal" id="newsModal">
-        <div class="news-modal__content">
-            <button class="news-modal__close" id="modalCloseBtn">&times;</button>
+    <!--News Page End-->
 
-            <div class="news-modal__media">
-                <img src="" alt="News Image" id="modalImage">
-            </div>
 
-            <div class="news-modal__body">
-                <h3 id="modalTitle"></h3>
-                <div id="modalDetailContent">
-                </div>
-            </div>
-        </div>
-    </div>
-</div><div class="mobile-nav__wrapper">
+</div><!-- /.page-wrapper -->
+
+
+<div class="mobile-nav__wrapper">
     <div class="mobile-nav__overlay mobile-nav__toggler"></div>
+    <!-- /.mobile-nav__overlay -->
     <div class="mobile-nav__content">
         <span class="mobile-nav__close mobile-nav__toggler"><i class="fa fa-times"></i></span>
 
         <div class="logo-box">
             <a href="index.html" aria-label="logo image"><img src="static/picture/website_logo.png" width="155" alt=""></a>
         </div>
+        <!-- /.logo-box -->
         <div class="mobile-nav__container"></div>
+        <!-- /.mobile-nav__container -->
     </div>
+    <!-- /.mobile-nav__content -->
 </div>
+<!-- /.mobile-nav__wrapper -->
+
 <script src="static/js/jquery-3.6.0.min.js"></script>
 <script src="static/js/bootstrap.bundle.min.js"></script>
 <script src="static/js/jarallax.min.js"></script>
@@ -538,71 +398,8 @@
 <script src="https://ditu.google.cn/maps/api/js?key=AIzaSyATY4Rxc8jNvDpsK8ZetC7JyN4PFVYGCGM"></script>
 
 
+<!-- template js -->
 <script src="static/js/izeetak.js"></script>
-
-<script>
-    // 确保 DOM 完全加载后再执行脚本
-    document.addEventListener('DOMContentLoaded', function() {
-
-        // 1. 获取弹窗和其关键组件
-        const modal = document.getElementById('newsModal');
-        const modalCloseBtn = document.getElementById('modalCloseBtn');
-        const modalImage = document.getElementById('modalImage');
-        const modalTitle = document.getElementById('modalTitle');
-        const modalDetailContent = document.getElementById('modalDetailContent');
-
-        // 2. 获取所有 "查看详情" 按钮
-        const detailButtons = document.querySelectorAll('.news-card__btn');
-
-        // 3. 为每个按钮添加点击事件
-        detailButtons.forEach(button => {
-            button.addEventListener('click', function(event) {
-                event.preventDefault(); // 阻止 <a> 标签的默认跳转行为
-
-                // a. 找到被点击按钮所在的 .news-card 父元素
-                const card = this.closest('.news-card');
-
-                // b. 从卡片中提取需要的数据
-                const imageSrc = card.querySelector('.news-card__media img').src;
-                const title = card.querySelector('.news-card__title a').innerText;
-                const detailsHTML = card.querySelector('.news-card__details').innerHTML;
-
-                // c. 将数据填充到弹窗中
-                modalImage.src = imageSrc;
-                modalTitle.innerText = title;
-                modalDetailContent.innerHTML = detailsHTML;
-
-                // d. 显示弹窗 (通过添加 'show' 类)
-                modal.classList.add('show');
-            });
-        });
-
-        // 4. 定义关闭弹窗的函数
-        function closeModal() {
-            modal.classList.remove('show');
-        }
-
-        // 5. 绑定关闭事件
-        // a. 点击关闭按钮 (X)
-        modalCloseBtn.addEventListener('click', closeModal);
-
-        // b. 点击弹窗外部的遮罩层
-        modal.addEventListener('click', function(event) {
-            // 检查点击的是否是遮罩层本身 (而不是弹窗内容)
-            if (event.target === modal) {
-                closeModal();
-            }
-        });
-
-        // c. 响应 'Escape' 键
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape' && modal.classList.contains('show')) {
-                closeModal();
-            }
-        });
-
-    });
-</script>
 </body>
 
 </html>
